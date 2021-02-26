@@ -3,7 +3,7 @@
 <br/>
 
 # VIDEO CHAT PROJECT
-simple video chat project for the university network course 
+simple video chat project for the university network course <br/>
 *IAUN university*
 
 ## How to use
