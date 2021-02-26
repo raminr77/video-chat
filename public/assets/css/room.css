@@ -74,10 +74,10 @@ video {
 .btn:hover {
     background-color: #1976D2;
 }
-.end {
+.end-call-btn {
     background-color: #f03;
 }
-.end:hover {
+.end-call-btn:hover {
     background-color: #df0e37;
 }
 
