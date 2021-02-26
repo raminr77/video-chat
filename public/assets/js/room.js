@@ -1,51 +1,65 @@
-const errorToasrOptions = {
-    style: {
-        main: {
-            'color': "#fff",
-            'max-width': "200px",
-            'box-shadow': 'unset',
-            'background': "#f44336",
+const toastOption = {
+    error: {
+        style: {
+            main: {
+                'color': "#fff",
+                'max-width': "200px",
+                'box-shadow': 'unset',
+                'background': "#f44336",
+            },
         },
     },
-}
-const successToasrOptions = {
-    style: {
-        main: {
-            'color': "#fff",
-            'max-width': "200px",
-            'box-shadow': 'unset',
-            'background': "#43A047",
+    success: {
+        style: {
+            main: {
+                'color': "#fff",
+                'max-width': "200px",
+                'box-shadow': 'unset',
+                'background': "#43A047",
+            },
         },
-    },
+    }
 }
 
-const socket = io('/')
+// Document Elements
+const grid = document.querySelector('.video-grid')
 const copyBtn = document.querySelector('.js-copy')
 const startCallTime = document.querySelector('.start-call')
 const callDuration = document.querySelector('.call-duration')
-const grid = document.querySelector('.video-grid')
+
+// Local Video
+const video = document.createElement('video')
+video.style.borderColor = '#fff'
+video.muted = true
+
+// Socket
+const socket = io('/')
+
+// PeerJS Config
 const myPeer = new Peer(undefined, {
     host: '/',
     port: '8001'
 })
 const peers = {}
-const video = document.createElement('video')
-video.style.borderColor = '#fff'
-video.muted = true
-
-const d = new Date()
-callDuration.innerHTML = ` 00:00:00`
-startCallTime.innerHTML = ` ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
-
 myPeer.on('open', id => {
     socket.emit('join-room', ROOM_ID, id)
 })
 
+// Set Date Time
+const d = new Date()
+callDuration.innerHTML = ` 00:00:00`
+startCallTime.innerHTML = ` ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
+
+
+// Main Function ( first: Get User Perm )
 navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
 }).then(stream => {
+    // Append User Video
     appendVideo(video, stream)
+
+    // Answer Call And Append
     myPeer.on('call', call => {
         call.answer(stream)
         const video = document.createElement('video')
@@ -53,24 +67,32 @@ navigator.mediaDevices.getUserMedia({
             appendVideo(video, userVideoStream)
         })
     })
+
+    // Connect To New User
     socket.on('user-connected', userId => {
-        iqwerty.toast.toast('A new user has joined.' , successToasrOptions)
+        iqwerty.toast.toast('A new user has joined.' , toastOption.success)
         connectToNewUser(userId, stream)
     })
+
+    // Close Call After Left User
     socket.on('user-disconnected', userId => {
         if (peers[userId]) {
-            iqwerty.toast.toast('User Left !' , errorToasrOptions)
+            iqwerty.toast.toast('User Left !' , toastOption.error)
             peers[userId].close()
         }
     })
-})
 
+}).catch(error => console.log('Get User Media Error :', error))
+
+
+// Append User Video To The Room List
 function appendVideo(video, stream) {
     video.srcObject = stream
     video.addEventListener('loadedmetadata', () => video.play())
     grid.appendChild(video)
 }
 
+// Connect Or Close Calls
 function connectToNewUser(userId, stream) {
     const call = myPeer.call(userId, stream)
     const video = document.createElement('video')
@@ -81,19 +103,20 @@ function connectToNewUser(userId, stream) {
     peers[userId] = call
 }
 
+// Copy Room Link
 copyBtn.addEventListener('click', () => {
     var copyText = document.querySelector(".roomId")
     copyText.select()
     copyText.setSelectionRange(0, 99999)
     document.execCommand("copy")
     copyText.blur()
-    iqwerty.toast.toast('Copied' , successToasrOptions)
+    iqwerty.toast.toast('Copied' , toastOption.success)
 })
 
+// Call Counter
 let h = 0
 let m = 0
 let s = 0
-
 setInterval(() => {
     s++
     if(s > 59){
