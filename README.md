@@ -1,7 +1,5 @@
 <br/>
-<div style="text-align:center">
     <img width="200" src="./public/icon.png" alt="video chat" />
-</div>
 <br/>
 
 # VIDEO CHAT PROJECT
