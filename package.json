@@ -4,7 +4,7 @@
   "description": "video chat project for uni",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "nodemon --delay 500ms server.js",
     "start-peer": "peerjs --port 8001"
   },
   "keywords": [],
